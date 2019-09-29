@@ -1,0 +1,123 @@
+{extend name="../application/admin/view/layout.html" /}
+
+{block name="head"}
+<link href="{:staticResource('css/plugins/iCheck/custom.css')}" rel="stylesheet">
+{/block}
+
+{block name="content"}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="col-sm-3 m-b-xs">
+                        <select class="form-control inline" id="role_select">
+                            <option value="0">全部角色</option>
+                            {foreach $roles as $k =>$r}
+                            <option value="{$k}" {if $role_check == $k} selected {/if}>{$r}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="col-sm-6 m-b-xs">
+
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <input type="text" placeholder="请输入关键词" class="form-control" id="key" value="{$key}">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-primary" onclick="search()"> 搜索</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <button type="button" class="btn btn-primary" onclick="pop_iframe('添加用户',`{:url('admin/admin/add')}`)"> 添加用户 </button>
+                            <button type="button" class="btn btn-danger" id="delete_more"> 批量删除 </button>
+                        </div>
+                        <div class="ibox-content">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th><input type="checkbox" class="i-checks" id="check_all"></th>
+                                    <th>ID</th>
+                                    <th>头像</th>
+                                    <th>登录名</th>
+                                    <th>角色</th>
+                                    <th>手机</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <form id="check_ids" action="{:url('admin/admin/del')}">
+                                        {foreach $data as $v}
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="i-checks" value="{$v.id}" name="id[]">
+                                            </td>
+                                            <td>{$v.id}</td>
+                                            <td><img src="{$v.image}" alt="" style="height: 50px;width: 50px;"></td>
+                                            <td>{$v.login_name}</td>
+                                            <td>{$v.role_id}</td>
+                                            <td>{$v.mobile}</td>
+                                            <td>
+                                                <div class="switch">
+                                                    <div class="onoffswitch">
+                                                        <input type="checkbox"  class="onoffswitch-checkbox" data-url="{:url('admin/admin/status')}" data-id="{$v.id}" id="sw-{$v.id}" {if $v.status == 1}checked{/if}>
+                                                        <label class="onoffswitch-label" for="sw-{$v.id}">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <a href="javascript:;" onclick="pop_iframe('编辑用户',`{:url('admin/admin/edit',['id' => $v.id])}`)" class="option-btn" title="编辑"><i class="glyphicon glyphicon-pencil text-navy"></i></a>
+                                                {if $v.role_id != '超级管理员'}
+                                                <a href="javascript:;" class="option-btn delete-one" title="删除" data-url="{:url('admin/admin/del')}" data-id="{$v.id}"><i class="glyphicon glyphicon-trash text-navy"></i></a>
+                                                {/if}
+                                            </td>
+                                        </tr>
+                                        {/foreach}
+                                    </form>
+                                </tbody>
+                            </table>
+                        </div>
+                        {$data|raw}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{/block}
+
+{block name="js"}
+<!--选择框JS-->
+<script src="{:staticResource('js/plugins/iCheck/icheck.min.js')}"></script>
+
+<script>
+
+    $(document).ready(function () {
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+
+    });
+
+    // 搜索
+    function search() {
+        var select = $('#role_select').val();
+        var key = $('#key').val();
+        location.replace("{:url('admin/admin/list')}" + '?role=' + select + '&key=' + key);
+    }
+</script>
+{/block}
+

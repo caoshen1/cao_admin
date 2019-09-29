@@ -1,0 +1,126 @@
+<?php
+
+namespace app\admin\controller{%namespace%};
+
+use app\common\model\{%model%};
+use app\common\service\BaseService;
+use think\Request;
+{%base_controller%}
+
+/**
+ * {%module%}
+ * Class {%controller%}Controller
+ * @package app\admin\controller
+ */
+class {%controller%}Controller extends BaseController
+{
+    /**
+     * {%module%}列表
+     * @authCheck true
+     * @menu_id {%menu%}
+     * @param Request $request
+     * @return \think\response\View
+     * @throws \app\common\exception\CustomException
+     * @throws \think\exception\DbException
+     */
+    public function index(Request $request)
+    {
+        $input = BaseService::requestParams([
+            'key',
+        ]);
+        $w = BaseService::makeWhere($input,[
+            ['{%key%}','like','key'],
+        ]);
+        // 查询字段赋值
+        $key = empty($input['key']) ? '' : $input['key'];
+        $query = [
+            'page' => $request->get('page',1,'intval'),
+            'query' => $request->get(),
+        ];
+        $data = {%model%}::where($w)->order('id desc')->paginate($request->get('limit',10,'intval'),false,$query);
+        $total = $data->total();
+        return view('admin@{%min_controller%}/index',compact('total','data','key'));
+    }
+
+    /**
+     * 展示{%module%}新增页面
+     * @authCheck true
+     * @menu_id {%menu%}
+     * @return \think\response\View
+     * @throws \app\common\exception\CustomException
+     */
+    public function showAdd()
+    {
+        return view('admin@{%min_controller%}/info');
+    }
+
+    /**
+     * 添加修改{%module%}
+     * @authCheck true
+     * @menu_id {%menu%}
+     * @return \think\response\Json
+     * @throws \app\common\exception\CustomException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function save()
+    {
+        // 接收参数且做基本验证 [字段名 => [默认值，验证规则（tp内置所有规则|正则表达式|模型名|[类名,方法名]），验证错误提示语（可空）] , ...]
+        $input = BaseService::requestParams([
+            {%edit_param%}
+        ]);
+        // 上面验证规则使用了模型名判断主键是否存在后，可以使用 GlobalParam::get(字段名 . '_model')来获取该模型对象
+        // 保存
+        return api_response(BaseService::saveData($input,{%model%}::class));
+    }
+
+    /**
+     * 显示编辑{%module%}页面
+     * @authCheck true
+     * @menu_id {%menu%}
+     * @param $id
+     * @return string|\think\response\View
+     * @throws \app\common\exception\CustomException
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function showEdit($id)
+    {
+        // 参数错误返回上一页
+        if(empty($id) || !$data = {%model%}::find($id)) return $this->goBack();
+
+        return view('admin@{%min_controller%}/info',compact('data'));
+    }
+
+    /**
+     * 修改{%module%}状态
+     * @authCheck true
+     * @menu_id {%menu%}
+     * @param Request $request
+     * @return \think\response\Json
+     * @throws \app\common\exception\CustomException
+     */
+    public function setStatus(Request $request)
+    {
+        $id = $request->post('id',0,'intval');
+        return api_response(BaseService::saveStatus($id,{%model%}::class));
+    }
+
+
+    /**
+     * 删除{%module%}
+     * @authCheck true
+     * @menu_id {%menu%}
+     * @param Request $request
+     * @return \think\response\Json
+     * @throws \app\common\exception\CustomException
+     */
+    public function delete(Request $request)
+    {
+        $id = $request->post('id');
+
+        return api_response(BaseService::deleteData($id,{%model%}::class));
+    }
+}

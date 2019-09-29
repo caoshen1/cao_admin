@@ -1,0 +1,79 @@
+{extend name="../application/admin/view/layout.html" /}
+{block name="head"}
+
+{/block}
+
+{block name="content"}
+<div class="middle-box text-center loginscreen  animated fadeInDown">
+    <div>
+        <div>
+            <h1 class="logo-name">H+</h1>
+        </div>
+        <h3>欢迎使用{$project_name}后台管理系统</h3>
+
+        <form class="m-t" role="form" action="index.html">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="用户名" id="login_name">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-control" placeholder="密码" id="pwd">
+            </div>
+            <div class="form-group" style="position: relative;height: 34px;">
+                <input type="text" class="form-control" placeholder="验证码" id="captcha" style="width: 62%; position: absolute">
+                <img src="{:url('admin/captcha')}" alt="验证码" id="cap-img" onclick="getCaptcha()" style="height: 34px; position: absolute;right: 0;cursor: pointer;">
+            </div>
+            <button type="button" class="btn btn-primary block full-width m-b" onclick="login()">登 录</button>
+            </p>
+        </form>
+    </div>
+</div>
+{/block}
+
+{block name="js"}
+<script type="text/javascript">
+    // 切换验证码
+    function getCaptcha() {
+        $('#cap-img').attr('src',"{:url('admin/captcha')}" + '?a=' + Math.random());
+    }
+
+    // 提交
+    function login() {
+        let admin_name = $('#login_name').val();
+        let password = $('#pwd').val();
+        let captcha = $('#captcha').val();
+
+        if(!admin_name) {
+            layer.msg('请输入登录名', {icon: 5});
+            return;
+        }
+        if(!password) {
+            layer.msg('请输入登录密码', {icon: 5});
+            return;
+        }
+        if(!captcha) {
+            layer.msg('请输入验证码', {icon: 5});
+            return;
+        }
+        //在这里执行表单提交
+        $.ajax({
+            url: "{:url('admin/login')}",
+            type:'post',
+            data:{
+                admin_name,
+                password,
+                captcha,
+            },
+            success:function(res){
+                if(res.code != 1){
+                    layer.msg(res.msg, {icon: 5});
+                }else{
+                    layer.msg('登录成功', {icon: 1},function () {
+                        location.replace("{:url('admin/index')}")
+                    });
+                }
+            }
+        })
+    }
+</script>
+
+{/block}

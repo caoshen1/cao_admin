@@ -1,0 +1,263 @@
+{extend name="../application/admin/view/layout.html" /}
+
+{block name="head"}
+<link href="{:staticResource('css/plugins/iCheck/custom.css')}" rel="stylesheet">
+{/block}
+
+{block name="content"}
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form method="post" class="form-horizontal" id="page-conf">
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">模块名</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control"  name="module">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">菜单ID</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control"  name="menu_id">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">控制器名</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="controller">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">模型</label>
+                            <div class="col-sm-10">
+                                <select class="form-control inline model-select" name="model">
+                                    <option value="0">请选择模型</option>
+                                    {foreach $models as $m}
+                                    <option value="{$m}">{$m}</option>
+                                    {/foreach}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">主键</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="model_pk" id="model-pk" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">路由文件名</label>
+                            <div class="col-sm-10">
+                                <select class="form-control inline" name="route_file">
+                                    <option value="0">请选择路由文件</option>
+                                    {foreach $routes as $r}
+                                    <option value="{$r}">{$r}</option>
+                                    {/foreach}
+                                </select>
+                                <!--<input type="text" class="form-control" name="route_file">-->
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">列表页配置</label>
+                            <div class="col-sm-10">
+                                <div id="field-item">
+                                    <div class="form-group">
+                                        <label class="col-sm-1 control-label">展示字段</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" name="field_title[]" placeholder="字段标题">
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <!--<input type="text" class="form-control" name="field_name[]" placeholder="对应数据库字段">-->
+                                            <select class="form-control inline model-field" name="field_name[]">
+                                                <option value="">对应数据库字段</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="input-group">
+                                                <select class="form-control inline" name="field_style[]">
+                                                    <option value="0">字段风格</option>
+                                                    <option value="text">文字</option>
+                                                    <option value="image">图片</option>
+                                                    <option value="switch">开关</option>
+                                                </select>
+                                                <span class="input-group-btn field-conf">
+                                                    <button type="button" class="btn btn-danger rm-field-item"> × </button>
+                                                    <button type="button" class="btn btn-primary add-field-item"> + </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-1 control-label">搜索字段</label>
+                                    <div class="col-sm-11" id="search-fields">
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="hr-line-dashed"></div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">编辑页配置</label>
+                            <div class="col-sm-10">
+                                <div id="edit-item">
+                                    <div class="form-group">
+                                        <label class="col-sm-1 control-label">展示字段</label>
+                                        <div class="col-sm-2">
+                                            <input type="text" class="form-control" name="edit_title[]" placeholder="字段标题">
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <!--<input type="text" class="form-control" name="edit_name[]" placeholder="对应数据库字段">-->
+                                            <select class="form-control inline model-field" name="edit_name[]">
+                                                <option value="">对应数据库字段</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4 hidden">
+                                            <input type="text" class="form-control" name="edit_null" placeholder="待选项（标题:值|标题:值）">
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="input-group">
+                                                <select class="form-control inline edit-select-item" name="edit_style[]">
+                                                    <option value="0">字段风格</option>
+                                                    <option value="text">单行文本框</option>
+                                                    <option value="file">文件</option>
+                                                    <option value="area">文本域</option>
+                                                    <option value="select">下拉选框</option>
+                                                    <option value="radio">单选框</option>
+                                                    <option value="switch">开关</option>
+                                                    <option value="checkbox">多选框</option>
+                                                </select>
+                                                <span class="input-group-btn field-conf">
+                                                    <button type="button" class="btn btn-danger rm-field-item"> × </button>
+                                                    <button type="button" class="btn btn-primary add-field-item"> + </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <button class="btn btn-primary" type="button" id="sub">生成代码</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{/block}
+
+{block name="js"}
+<script src="{:staticResource('js/plugins/iCheck/icheck.min.js')}"></script>
+<script>
+    $(function () {
+
+        // 提交表单
+        $('#sub').click(function () {
+            layer.confirm('确定提交生成代码吗?', {icon: 3, title:'提示'}, function(index){
+                http_post(
+                    "{:url('caoAdmin/go')}",
+                    $('#page-conf').serialize(),
+                    res => {
+                        layer.msg('生成成功',{icon:1},function() {
+                            parent.location.reload();
+                        })
+                    }
+                )
+                layer.close(index);
+            });
+        })
+
+        // 创建一个列表页配置元素
+        $('#field-item').on('click','.add-field-item',function () {
+            $(this).parents('.form-group').eq(0).clone().appendTo('#field-item');
+
+        });
+
+        // 移除一个列表页配置元素
+        $('#field-item').on('click','.rm-field-item',function () {
+            if($('#field-item').children('.form-group').length > 1) {
+                $(this).parents('.form-group').eq(0).remove();
+            }
+        });
+
+        // 为编辑页面的选框绑定事件
+        $('#edit-item').on('change','.edit-select-item',function () {
+            var curchange = $(this).val();
+            if(curchange == 'select' || curchange == 'checkbox' || curchange == 'radio') {
+                var name_str = $(this).parents('.col-sm-3').eq(0).prev().prev().children(":first").val();
+                if(!name_str) {
+                    layer.msg('请输入数据库字段名',{icon:5});
+                    return;
+                }
+                $(this).parents('.col-sm-3').eq(0).prev().removeClass('hidden').find('input').attr('name','edit_'+ name_str + '_option');
+            }else{
+                $(this).parents('.col-sm-3').eq(0).prev().addClass('hidden');
+            }
+        })
+
+        // 创建一个编辑页面配置元素
+        $('#edit-item').on('click','.add-field-item',function () {
+            $(this).parents('.form-group').eq(0).clone().appendTo('#edit-item');
+        })
+
+        // 移除一个编辑页配置元素
+        $('#edit-item').on('click','.rm-field-item',function () {
+            if($('#edit-item').children('.form-group').length > 1) {
+                $(this).parents('.form-group').eq(0).remove();
+            }
+        });
+
+        // 根据模型获取字段
+        $('.model-select').on('change',function () {
+            http_post(
+                "{:url('caoAdmin/get_fields')}",
+                {model: $(this).val()},
+                (data) => {
+                    $('.model-field').empty();
+                    $('#search-fields').empty();
+                    $('.model-field').append("<option value=''>对应数据库字段</option>");
+                    $('#model-pk').val(data.pk);
+                    var len = data.fields.length;
+                    // <label class="checkbox-inline"><input type="checkbox" class="i-checks" value="option1" name="search_field[]">a</label>
+                    for(var i = 0; i < len; i++) {
+                        $('.model-field').append("<option value='"+data.fields[i]+"'>"+data.fields[i]+"</option>");
+                        $('#search-fields').append('<label class="checkbox-inline"><input type="checkbox" class="i-checks" value="'+ data.fields[i] +'" name="search_field[]">' + data.fields[i] + '</label>');
+                    }
+                    $('.i-checks').iCheck({
+                        checkboxClass: 'icheckbox_square-green',
+                        radioClass: 'iradio_square-green',
+                    });
+                }
+            )
+        });
+
+    })
+</script>
+{/block}

@@ -1,0 +1,8 @@
+{
+    "require": {
+        "topthink/think-queue": "^2.0",
+        "topthink/think-captcha": "2.0.*",
+        "yansongda/pay": "^2.8",
+        "alibabacloud/client": "^1.5"
+    }
+}

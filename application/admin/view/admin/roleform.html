@@ -1,0 +1,175 @@
+{extend name="../application/admin/view/layout.html" /}
+
+{block name="head"}
+<link href="{:staticResource('css/plugins/iCheck/custom.css')}" rel="stylesheet">
+{/block}
+
+{block name="content"}
+<div class="wrapper wrapper-content animated fadeInRight">
+
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="ibox float-e-margins">
+        <div class="ibox-content">
+          <form method="post" class="form-horizontal" id="main-form">
+
+            {if !empty($data)}
+            <div class="form-group">
+              <label class="col-sm-2 control-label">ID</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" value="{$data.id}" name="id" readonly>
+              </div>
+            </div>
+            {/if}
+
+            <div class="form-group">
+              <label class="col-sm-2 control-label">角色名</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" value="{:empty($data) ? '' : $data.name}" name="name">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-sm-2 control-label">权限列表</label>
+              <div class="col-sm-10">
+                <!--权限列表-->
+                <div class="dd" id="nestable">
+                  <ol class="dd-list">
+                    {foreach $auth_list as $k => $auth}
+                    <li class="dd-item dd-nodrag" data-id="0">
+                      <div class="dd-handle">
+                        <input type="checkbox" class="i-checks" name="auth_list[]" value="0" a-id="{0}">
+                        {$auth_title[$k]}
+                      </div>
+                      <ol class="dd-list">
+                        {foreach $auth as $au}
+                        <li class="dd-item" data-id="{$au.id}">
+                          <div class="dd-handle">
+                            <input type="checkbox" class="i-checks" name="auth_list[]" value="{$au.id}" a-id="{$au.id}">
+                            {$au.name}
+                          </div>
+                          <ol class="dd-list">
+                            {foreach $au.item as $v}
+                            <li class="dd-item" data-id="{$v.id}">
+                              <div class="dd-handle">
+                                <input type="checkbox" class="i-checks" name="auth_list[]" value="{$v.id}" a-id="{$v.id}">
+                                {$v.name}
+                              </div>
+                            </li>
+                            {/foreach}
+                          </ol>
+                        </li>
+                        {/foreach}
+                      </ol>
+                    </li>
+                    {/foreach}
+                  </ol>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-4 col-sm-offset-2">
+                <button class="btn btn-primary" type="button" id="sub">保存</button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{/block}
+
+{block name="js"}
+<!-- Nestable List -->
+<script src="{:staticResource('js/plugins/nestable/jquery.nestable.js')}"></script>
+<!--选择框JS-->
+<script src="{:staticResource('js/plugins/iCheck/icheck.min.js')}"></script>
+<script>
+    $(function () {
+        // 回显权限
+        var own_auth = {:arr2Str($data.auth_list)};
+        if(own_auth.length > 0) {
+            $("input[name='auth_list[]']:checkbox").each(function() {
+                if (own_auth.indexOf(parseInt($(this).attr('a-id'))) > -1) {
+                    $(this).iCheck('check')
+                }
+            });
+        }
+        // 当子选项有勾选，则勾选父选项
+        $("input[name='auth_list[]']:checkbox").each(function() {
+            if (true == $(this).is(':checked')) {
+                $(this).parents('ol').eq(0).prev().find('.i-checks').iCheck('check')
+            }
+        });
+        $("input[name='auth_list[]']:checkbox").each(function() {
+            if (true == $(this).is(':checked')) {
+                $(this).parents('ol').eq(0).prev().find('.i-checks').iCheck('check')
+            }
+        });
+
+        // 提交表单
+        $('#sub').click(function () {
+            var auth_list = [];
+            $("input[name='auth_list[]']:checkbox").each(function() {
+                if (true == $(this).is(':checked') && $(this).val() != 0) {
+                    auth_list.push(parseInt($(this).val()))
+                }
+            });
+            if(auth_list.length == 0) {
+                layer.msg('请选择权限');
+                return;
+            }
+
+            http_post(
+                "{:url('admin/role/save')}",
+                $('#main-form').serialize(),
+                function (res) {
+                    layer.msg('保存成功',{icon:1},function () {
+                        parent.location.reload();
+                    })
+                }
+            )
+            return false;
+        })
+
+        // 权限列表
+        var updateOutput = function (e) {
+            var list = e.length ? e : $(e.target),
+                output = list.data('output');
+            if (window.JSON) {
+                output.val(window.JSON.stringify(list.nestable('serialize'))); //, null, 2));
+            } else {
+                output.val('浏览器不支持');
+            }
+        };
+
+        // activate Nestable for list 2
+        $('#nestable').nestable({
+            group: 1,
+            allowDrag:false
+        }).on('change', updateOutput);
+
+        updateOutput($('#nestable').data('output', $('#nestable2-output')));
+
+        // 选择框
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+
+        // 全选或全不选权限
+        $('#nestable input').on('ifChecked ifUnchecked', function(e){
+            if(e.type == 'ifChecked') {
+                $(this).parents('.dd-item').eq(0).find('.i-checks').iCheck('check')
+            }else{
+                $(this).parents('.dd-item').eq(0).find('.i-checks').iCheck('uncheck')
+            }
+        });
+
+    })
+</script>
+{/block}

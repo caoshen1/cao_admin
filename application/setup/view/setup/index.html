@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>氧化钙 CaO_admin</title>
+
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="{:staticResource('css/bootstrap.min.css?v=3.3.6')}" rel="stylesheet">
+    <link href="{:staticResource('css/font-awesome.css?v=4.4.0')}" rel="stylesheet">
+    <link href="{:staticResource('css/plugins/iCheck/custom.css')}" rel="stylesheet">
+    <link href="{:staticResource('css/animate.css')}" rel="stylesheet">
+    <link href="{:staticResource('css/style.css?v=4.1.0')}" rel="stylesheet">
+
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>CaO_admin安装</h5>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <small>(数据库相关配置请直接配置tp5.1数据库配置文件，安装完成后可删除application文件夹下的setup文件夹)</small>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal" id="setup-form">
+
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-1 control-label">后台管理员用户名:</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" name="login_name">
+                            </div>
+                            <div class="col-sm-3"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-1 control-label">后台管理员密码:</label>
+                            <div class="col-sm-6">
+                                <input type="password" class="form-control" name="pwd">
+                            </div>
+                            <div class="col-sm-3"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-2"></div>
+                            <label class="col-sm-1 control-label">确认后台管理员密码:</label>
+                            <div class="col-sm-6">
+                                <input type="password" class="form-control" name="repwd">
+                            </div>
+                            <div class="col-sm-3"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-1"></div>
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <button class="btn btn-primary" type="button" id="setup">开始安装</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 全局js -->
+<script src="{:staticResource('js/jquery.min.js?v=2.1.4')}"></script>
+<script src="{:staticResource('js/bootstrap.min.js?v=3.3.6')}"></script>
+<script src="{:staticResource('js/plugins/slimscroll/jquery.slimscroll.min.js')}"></script>
+<script src="{:staticResource('js/plugins/layer/layer.min.js')}"></script>
+<script src="{:staticResource('extend/common.js?')}"></script>
+
+<!-- iCheck -->
+<script src="{:staticResource('js/plugins/iCheck/icheck.min.js')}"></script>
+<script>
+    $(document).ready(function () {
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+
+        // 提交表单
+        $('#setup').click(function () {
+            layer.confirm('请确认安装信息无误?', {icon: 3, title:'提示'}, function(index){
+                http_post(
+                    "{:url('setup/run')}",
+                    $('#setup-form').serialize(),
+                    res => {
+                        layer.msg('安装成功',{icon:1},function() {
+                            location.replace("{:url('admin/login')}")
+                        })
+                    }
+                )
+                layer.close(index);
+            });
+        })
+
+    });
+</script>
+
+</body>
+
+</html>

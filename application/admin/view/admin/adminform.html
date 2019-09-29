@@ -1,0 +1,144 @@
+{extend name="../application/admin/view/layout.html" /}
+
+{block name="head"}
+
+{/block}
+
+{block name="content"}
+<div class="wrapper wrapper-content animated fadeInRight">
+
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="ibox float-e-margins">
+        <div class="ibox-content">
+          <form method="post" class="form-horizontal" id="admin-info">
+
+            {if !empty($data)}
+            <div class="form-group">
+              <label class="col-sm-2 control-label">ID</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" value="{$data.id}" name="id" readonly>
+              </div>
+            </div>
+            {/if}
+
+            <!--编辑状态下的角色-->
+            {if !empty($data)}
+            <div class="form-group">
+              <label class="col-sm-2 control-label">角色</label>
+              <div class="col-sm-10 role-select">
+                {foreach $data.role_id as $r_id}
+                <div class="input-group">
+                  <select class="form-control inline" name="role_id[]">
+                    <option value="0">角色</option>
+                    {foreach $roles as $k =>$r}
+                    <option value="{$k}" {if $r_id == $k} selected {/if}>{$r}</option>
+                    {/foreach}
+                  </select>
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-primary add_role">+</button>
+                  </span>
+                </div>
+                {/foreach}
+              </div>
+            </div>
+            {else}
+            <!--添加状态下的角色-->
+            <div class="form-group">
+              <label class="col-sm-2 control-label">角色</label>
+              <div class="col-sm-10 role-select">
+                <div class="input-group">
+                  <select class="form-control inline" name="role_id[]">
+                    <option value="0">角色</option>
+                    {foreach $roles as $k => $r}
+                    <option value="{$k}">{$r}</option>
+                    {/foreach}
+                  </select>
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-primary add_role">+</button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            {/if}
+
+            <div class="form-group">
+              <label class="col-sm-2 control-label">登录名</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" value="{:empty($data) ? '' : $data.login_name}" name="login_name">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-sm-2 control-label">密码</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" value="" name="pwd">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-sm-2 control-label">手机</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" value="{:empty($data) ? '' : $data.mobile}" name="mobile">
+              </div>
+            </div>
+
+
+            <div class="form-group">
+              <div class="col-sm-4 col-sm-offset-2">
+                <button class="btn btn-primary" type="button" id="sub">保存</button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{/block}
+
+{block name="js"}
+<script>
+    $(function () {
+        // 提交表单
+        $('#sub').click(function () {
+            http_post(
+                "{:url('admin/admin/save')}",
+                $('#admin-info').serialize(),
+                function (res) {
+                    layer.msg('保存成功',{icon:1},function () {
+                        parent.location.reload();
+                    })
+                }
+            )
+            return false;
+        })
+
+        // 创建一个角色元素
+        $('.role-select').on('click','.add_role',function () {
+            var tmp = `
+            <div class="input-group">
+                  <select class="form-control inline" name="role_id[]">
+                    <option value="0">角色</option>
+                    {foreach $roles as $k => $r}
+                    <option value="{$k}">{$r}</option>
+                    {/foreach}
+                  </select>
+                  <span class="input-group-btn">
+                    <button type="button" class="btn btn-danger remove_role">&times;</button>
+                    <button type="button" class="btn btn-primary add_role">+</button>
+                  </span>
+                </div>
+            `;
+            $(this).parents('div').eq(1).append(tmp);
+        });
+
+        // 移除一个角色元素
+        $('.role-select').on('click','.remove_role',function () {
+            $(this).parents('.input-group').remove();
+        });
+    })
+</script>
+{/block}

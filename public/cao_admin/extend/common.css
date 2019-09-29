@@ -1,0 +1,21 @@
+/**********文件上传框*********/
+.file-area{
+    display: flex;
+}
+.file-area .file-pretty{
+    flex: 1;
+}
+.file-area .back-change{
+    margin-left: 10px;
+}
+
+/**********表格操作按钮*********/
+.option-btn {
+    margin-left: 10px;
+}
+
+/************表单文本域*************/
+.form-textarea {
+    width: 100%;
+    resize: none;
+}

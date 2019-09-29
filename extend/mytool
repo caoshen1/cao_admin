@@ -1,0 +1,72 @@
+<?php
+
+namespace mytool;
+
+use mytools\system\System;
+
+// 引入函数库
+require __DIR__ .'/mytools/my_function.php';
+// 引入配置文件
+define('TOOL_CONFIG',require __DIR__ . '/mytools/conf/tool.php');
+// 引入命令文件
+require __DIR__ . '/mytools/command.php';
+// 引入工作类
+$arr = require __DIR__ . '/work_list.php';
+// 引入命令列表
+$com_list = require __DIR__ . '/command_list.php';
+
+// 注册自动加载
+define('ROOT_PATH', str_replace('\\','/',__DIR__) . '/');
+spl_autoload_register(function ($class) {
+    require_once ROOT_PATH . str_replace('\\', '/', $class) . '.php';
+});
+
+// 输出提示头
+fwrite(STDOUT, "您好，我是您的工具助手，我可以帮你做以下事情:" . PHP_EOL . PHP_EOL);  //标准输出
+showList($arr);
+fwrite(STDOUT, PHP_EOL . "输入对应的序号就可以了哦^_^(可以使用help命令查看帮助哦)" . PHP_EOL);  //标准输出
+
+// 添加环境变量
+if(TOOL_CONFIG['add_path']){
+    (new System())->seeYouOnce();
+}
+// 开始执行
+while (true) {
+    $key = trim(fgets(STDIN));
+    if (key_exists($key, $com_list) || $key === 'help') { // 执行命令
+        if($key === 'help') {
+            help($com_list);
+        }else {
+            $com_list[$key][0]();
+        }
+        continue;
+    } elseif (key_exists($key, $arr)) { // 执行类
+        // 退出
+        if ($arr[$key]['class'] == 'exit') {
+            fwrite(STDOUT, "那我先退下啦！" . PHP_EOL);
+            break;
+        }
+        // pathinfo模式
+        if ($arr[$key]['class'] == 'pathinfo') {
+            fwrite(STDOUT, "请输入带命名空间的类名和方法，以'/'隔开" . PHP_EOL);
+            $path = explode('/', trim(fgets(STDIN)));
+            if (!file_exists(ROOT_PATH . str_replace('/','\\',$path[0]) . '.php')) {
+                fwrite(STDOUT, '没有找到对应的类!!' . PHP_EOL);
+                continue;
+            }
+            $class = $path[0];
+            $fun = $path[1] ?? 'index';
+        } else {
+            $class = $arr[$key]['class'];
+            $fun = $arr[$key]['fun'];
+        }
+        // 调用类的方法执行
+        $inctens = new $class();
+        $re = $inctens->$fun();
+        $re = $re ? $re : '办完了哟';
+        // 返回结果
+        fwrite(STDOUT, $re . PHP_EOL);
+    } else {
+        fwrite(STDOUT, "你想干点啥呢？(使用help查看帮助)" . PHP_EOL);
+    }
+}

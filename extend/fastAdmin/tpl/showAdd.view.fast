@@ -1,0 +1,62 @@
+{extend name="../application/admin/view/layout.html" /}
+
+{block name="head"}
+
+{/block}
+
+{block name="content"}
+<div class="wrapper wrapper-content animated fadeInRight">
+
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="ibox float-e-margins">
+        <div class="ibox-content">
+          <form method="post" class="form-horizontal" id="main-form">
+
+            {if !empty($data)}
+            <div class="form-group">
+              <label class="col-sm-2 control-label">{%pk_name%}</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" value="{$data.{%pk%}}" name="{%pk%}" readonly>
+              </div>
+            </div>
+            {/if}
+
+            {%form_body%}
+
+            <div class="form-group">
+              <div class="col-sm-4 col-sm-offset-2">
+                <button class="btn btn-primary" type="button" id="sub">保存</button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{/block}
+
+{block name="js"}
+<script>
+    $(function () {
+
+        // 提交表单
+        $('#sub').click(function () {
+            http_post(
+                "{:url('{%controller%}/save')}",
+                $('#main-form').serialize(),
+                function (res) {
+                    layer.msg('保存成功',{icon:1},function () {
+                        parent.location.reload();
+                    })
+                }
+            )
+            return false;
+        })
+
+    })
+</script>
+{/block}

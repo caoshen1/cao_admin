@@ -1,0 +1,93 @@
+{extend name="../application/admin/view/layout.html" /}
+
+{block name="head"}
+
+{/block}
+
+{block name="content"}
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    {if empty($data)}
+                    当前没有任何配置项
+                    {else}
+                    <form method="post" class="form-horizontal">
+                        {foreach $data as $conf}
+                        <div class="form-group">
+                            <label class="col-md-1 control-label">{$conf.title}</label>
+                            <div class="col-md-7">
+                            {if $conf.type == 'image'}
+                                <div class="input-group">
+                                    <div class="file-area">
+                                        <div class="file-pretty">
+                                            <input type="file" class="form-control" style="display: none;" up-url="{:url('admin/upload')}">
+                                            <div class="input-append input-group">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-white select" type="button">选择文件</button>
+                                                </span>
+                                                <input class="input-large form-control" type="text" name="{$conf.key}"  value="{$conf.value}" readonly>
+                                                <img class="beforeView" src="" style="display: none;">
+                                            </div>
+                                        </div>
+                                        <div class="back-change btn btn-primary">查看图片</div>
+                                    </div>
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary" onclick="save_conf('{$conf.key}')">修改</button>
+                                    </span>
+                                </div>
+                            {elseif $conf.type == 'switch'}
+                                <div class="switch" style="margin-top: 7px;">
+                                    <div class="onoffswitch">
+                                        <input type="checkbox"  class="onoffswitch-checkbox" data-url="{:url('config/save')}" data-id="{$conf.key}" id="sys-conf-{$conf.key}" {if $conf.value == 1}checked{/if}>
+                                        <label class="onoffswitch-label" for="sys-conf-{$conf.key}">
+                                            <span class="onoffswitch-inner"></span>
+                                            <span class="onoffswitch-switch"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            {else}
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="{$conf.key}" value="{$conf.value}">
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary" onclick="save_conf('{$conf.key}')">修改</button>
+                                    </span>
+                                </div>
+                            {/if}
+                            </div>
+                            <div class="col-md-4 form-control-static">
+                                {$conf.describe}
+                            </div>
+                        </div>
+                        {/foreach}
+                    </form>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{/block}
+
+{block name="js"}
+
+<script>
+    // 提交表单
+    function save_conf(key) {
+        http_post(
+            "{:url('config/save')}",
+            $('#admin-info').serialize(),
+            function (res) {
+                layer.msg('保存成功',{icon:1},function () {
+                    parent.location.reload();
+                })
+            }
+        )
+        return false;
+    }
+
+</script>
+{/block}
