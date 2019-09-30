@@ -177,7 +177,7 @@ class CaoAdminController extends Controller
                 // 解析待选项
                 foreach ($op_arr as $op_item) {
                     $temp = explode(':',$op_item);
-                    if(empty($temp[0]) || empty($temp[1])) dieReturn($edit[$title].'待选项格式错误');
+                    if($temp[0] == '' || $temp[1] == '') dieReturn($edit[$title].'待选项格式错误');
                     if($default === '') {
                         $default = $temp[1];
                     }

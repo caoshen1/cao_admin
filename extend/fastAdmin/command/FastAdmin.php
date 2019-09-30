@@ -354,15 +354,15 @@ EOF;
         // 读取当前路由文件，将字符串替换到标记处
         // |--先复制一份当前路由文件，以防失败
         $route_path = str_replace('\\', '/', env('route_path'));
-        copy($route_path . $this->conf['route_file'] . '.php', $route_path . $this->conf['route_file'] . '_cp.php');
-        $route_file_str = file_get_contents($route_path . $this->conf['route_file'] . '.php');
+        copy($route_path . strtolower($this->conf['route_file']) . '.php', $route_path . strtolower($this->conf['route_file']) . '_cp.php');
+        $route_file_str = file_get_contents($route_path . strtolower($this->conf['route_file']) . '.php');
         $route_file_str = str_replace('//----next_input_hear', $route_str, $route_file_str);
         // 再写入路由文件
-        if (!file_put_contents($route_path . $this->conf['route_file'] . '.php', $route_file_str)) {
+        if (!file_put_contents($route_path . strtolower($this->conf['route_file']) . '.php', $route_file_str)) {
             throw new CustomException('写入' . $this->conf['controller'] . '路由失败！');
         }
         // 成功后删除备份文件
-        unlink($route_path . $this->conf['route_file'] . '_cp.php');
+        unlink($route_path . strtolower($this->conf['route_file']) . '_cp.php');
     }
 
     // 获取app文件夹路径
